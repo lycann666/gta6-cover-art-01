@@ -3,97 +3,76 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vice Cover — GTA 6-style poster maker</title>
+<title>Vice City Cover Maker — GTA-style poster art from your photos</title>
 <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-<header class="topbar">
-  <div class="brand"><span class="brand-mark">VC</span><span class="brand-name">VICE COVER</span></div>
-  <p class="tagline">Turn your photo into a sunset-poster cover. 100% offline — photos never leave this machine.</p>
-</header>
 <main class="app">
-  <section class="panel" aria-label="Editor">
-    <h1>Make your cover</h1>
-    <ol class="steps">
-      <li>Add a photo</li>
-      <li>Pick a layout &amp; grade</li>
-      <li>Write the caption</li>
-      <li>Export PNG</li>
-    </ol>
+  <section class="controls">
+    <h1>Vice City Cover Maker</h1>
+    <p class="tagline">Your photo + a caption, turned into a GTA-style poster. Works fully offline — photos never leave your device.</p>
 
-    <div class="group">
-      <h2>1 · Photos</h2>
-      <label class="file">Photo A (hero)
-        <input id="photoA" type="file" accept="image/*">
+    <div class="step"><span class="num">1</span><div>
+      <label class="row">Your photos
+        <input id="photo" type="file" accept="image/*" multiple>
       </label>
-      <label class="file">Photo B (side panels)
-        <input id="photoB" type="file" accept="image/*">
-      </label>
-      <button id="useSamples" type="button" class="ghost">Try the sample photos</button>
-      <p class="hint">Your photos are read with FileReader and stay on your machine. Nothing is uploaded.</p>
-    </div>
-
-    <div class="group">
-      <h2>2 · Layout</h2>
-      <div class="row" id="layouts">
-        <button type="button" data-layout="hero" class="chip active">Hero + sides</button>
-        <button type="button" data-layout="grid" class="chip">Four grid</button>
-        <button type="button" data-layout="full" class="chip">Full bleed</button>
+      <div class="btnrow">
+        <button id="addPhoto" type="button">Add photos…</button>
+        <button id="samplePier" type="button" class="ghost">Try pier sample</button>
+        <button id="sampleBoulevard" type="button" class="ghost">Try boulevard sample</button>
       </div>
-      <h2>Colour grade</h2>
-      <div class="row" id="grades">
-        <button type="button" data-grade="sunset" class="chip active">Vice Sunset</button>
-        <button type="button" data-grade="neon" class="chip">Neon Night</button>
-        <button type="button" data-grade="day" class="chip">Palm Day</button>
-      </div>
-    </div>
+      <p id="photoCount" class="hint">No photos yet — add one, or try a sample.</p>
+    </div></div>
 
-    <div class="group">
-      <h2>3 · Caption</h2>
-      <label>Main caption
-        <input id="caption" type="text" maxlength="28" value="Sunset Heist">
-      </label>
-      <label>Sub-caption
-        <input id="sub" type="text" maxlength="40" value="Vice City Nights">
-      </label>
-    </div>
+    <div class="step"><span class="num">2</span><div>
+      <label>Layout</label>
+      <div id="layouts" class="picker"></div>
+      <label>Colour grade</label>
+      <div id="grades" class="picker"></div>
+    </div></div>
 
-    <div class="group">
-      <h2>Adjust a panel</h2>
-      <div class="row" id="panelPick"></div>
+    <div class="step"><span class="num">3</span><div>
+      <label>Accent word <input id="accentWord" type="text" maxlength="24" value="Welcome to"></label>
+      <label>Caption <input id="caption" type="text" maxlength="32" value="Sunset Heist"></label>
+      <label>Sub-caption <input id="sub" type="text" maxlength="40" value="Vice City Nights"></label>
+    </div></div>
+
+    <div class="step"><span class="num">4</span><div>
+      <label>Panel to adjust</label>
+      <div id="panels" class="picker"></div>
       <label>Photo in this panel
-        <select id="panelSrc">
-          <option value="a">Photo A</option>
-          <option value="b">Photo B</option>
+        <select id="panelPhoto">
+          <option value="0">Photo 1</option>
+          <option value="1">Photo 2</option>
         </select>
       </label>
-      <label>Zoom <span id="zoomVal">1.00×</span>
-        <input id="panelZoom" type="range" min="1" max="2.5" step="0.05" value="1">
+      <label>Zoom <span id="zoomVal">100%</span>
+        <input id="zoom" type="range" min="1" max="2.5" step="0.05" value="1">
       </label>
       <label>Move left / right
-        <input id="panelDx" type="range" min="-0.4" max="0.4" step="0.01" value="0">
+        <input id="shiftX" type="range" min="-0.4" max="0.4" step="0.01" value="0">
       </label>
       <label>Move up / down
-        <input id="panelDy" type="range" min="-0.4" max="0.4" step="0.01" value="0">
+        <input id="shiftY" type="range" min="-0.4" max="0.4" step="0.01" value="0">
       </label>
-    </div>
+    </div></div>
 
-    <div class="group">
-      <h2>4 · Export PNG</h2>
-      <div class="row" id="sizes">
-        <button type="button" data-w="1080" data-h="1080" class="chip size active">1080 × 1080</button>
-        <button type="button" data-w="1080" data-h="1350" class="chip size">1080 × 1350</button>
-        <button type="button" data-w="1920" data-h="1080" class="chip size">1920 × 1080</button>
-      </div>
-      <button id="export" type="button" class="big">Export PNG</button>
+    <div class="step"><span class="num">5</span><div>
+      <label>Export size
+        <select id="size">
+          <option value="1080x1080">1080 × 1080 — square post</option>
+          <option value="1080x1350">1080 × 1350 — portrait post</option>
+          <option value="1920x1080">1920 × 1080 — landscape</option>
+        </select>
+      </label>
+      <button id="export" type="button" class="cta">Export PNG</button>
       <p id="status" role="status"></p>
-    </div>
+      <p class="hint">Original fan-made poster tool. Not affiliated with Rockstar Games. Fonts: Anton &amp; Pacifico (SIL Open Font License).</p>
+    </div></div>
   </section>
-
-  <section class="stage" aria-label="Live preview">
-    <canvas id="cover" width="1080" height="1080"></canvas>
-    <p class="hint">Live preview — what you see is what the PNG looks like.</p>
-  </section>
+  <div class="preview">
+    <canvas id="cover" width="1080" height="1080" aria-label="Live cover preview"></canvas>
+  </div>
 </main>
 <script type="module" src="./src/main.js"></script>
 </body>

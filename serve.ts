@@ -1,10 +1,6 @@
-// A small static server for app/ (Node 22, standard library only), for
-// trying the entry locally without a build step:
-//   node serve.ts [--port 8080]
-// It serves only files under app/, with the MIME types an offline web app
-// needs, and refuses paths that climb out of app/. Development convenience
-// only — not a server for the internet.
-
+// Tiny static server for local testing only (Node 22, standard library only).
+// Serves app/ on http://localhost:8080 — run `node serve.ts`, open the URL,
+// try the editor. Refuses any path outside app/.
 import { createReadStream, statSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { extname, join, normalize, resolve, sep } from 'node:path';
@@ -12,8 +8,8 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(fileURLToPath(new URL('./app', import.meta.url)));
 const args = process.argv.slice(2);
-const portFlag = args.indexOf('--port');
-const wanted = portFlag === -1 ? 8080 : Number(args[portFlag + 1]);
+const portIndex = args.indexOf('--port');
+const wanted = portIndex === -1 ? 8080 : Number(args[portIndex + 1]);
 const port = Number.isInteger(wanted) && wanted > 0 && wanted < 65536 ? wanted : 8080;
 
 const MIME = {
@@ -25,14 +21,7 @@ const MIME = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg',
-  '.gif': 'image/gif',
-  '.webp': 'image/webp',
-  '.svg': 'image/svg+xml',
-  '.ico': 'image/x-icon',
-  '.woff2': 'font/woff2',
-  '.woff': 'font/woff',
   '.ttf': 'font/ttf',
-  '.otf': 'font/otf',
   '.txt': 'text/plain; charset=utf-8',
 };
 
