@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vice Cover Studio — GTA 6-style cover art maker</title>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <h1>Vice Cover Studio</h1>
+    <p>Turn your photos into a GTA-style poster cover. Original art — no Rockstar logos, artwork or fonts.</p>
+  </div>
+  <div class="top-actions">
+    <button id="undo" type="button" disabled>↶ Undo</button>
+    <button id="redo" type="button" disabled>↷ Redo</button>
+    <button id="exportBtn" type="button" class="primary">Export PNG ↓</button>
+  </div>
+</header>
+<main class="app">
+  <section class="controls" aria-label="Cover controls">
+    <div class="group">
+      <h2>1 · Photos</h2>
+      <label class="upload">Add your photos
+        <input id="upload" type="file" accept="image/*" multiple>
+      </label>
+      <div class="sample-row">
+        <button type="button" data-sample="boulevard">Load sample · Boulevard</button>
+        <button type="button" data-sample="pier">Load sample · Pier</button>
+      </div>
+      <div id="photoStrip" class="strip" aria-label="Your photos"></div>
+      <p class="hint">Click a photo to put it in the selected panel. Photos stay on your machine — nothing is uploaded.</p>
+    </div>
+
+    <div class="group">
+      <h2>2 · Panels</h2>
+      <div id="panelChips" class="chips" aria-label="Panels"></div>
+      <label>Zoom in panel
+        <input id="zoom" type="range" min="1" max="3" step="0.05" value="1">
+        <span id="zoomVal">100%</span>
+      </label>
+      <p>Selected panel photo: <strong id="panelPhoto">—</strong></p>
+      <div class="row">
+        <button id="fillAll" type="button">Fill all panels with this photo</button>
+        <button id="resetCrop" type="button">Reset crop</button>
+      </div>
+      <p class="hint">Drag a photo inside the preview to reposition it. Click a panel to select it.</p>
+    </div>
+
+    <div class="group">
+      <h2>3 · Layout</h2>
+      <div id="layoutRow" class="chips wrap" role="group" aria-label="Layout"></div>
+    </div>
+
+    <div class="group">
+      <h2>4 · Colour grade</h2>
+      <div id="gradeRow" class="chips wrap" role="group" aria-label="Colour grade"></div>
+    </div>
+
+    <div class="group">
+      <h2>5 · Motif</h2>
+      <div id="motifRow" class="chips wrap" role="group" aria-label="Motif"></div>
+    </div>
+
+    <div class="group">
+      <h2>6 · Caption</h2>
+      <label>Big title
+        <input id="titleInput" type="text" maxlength="24" value="VICE SUNSET">
+      </label>
+      <label>Script subtitle
+        <input id="subtitleInput" type="text" maxlength="40" value="a vice city story">
+      </label>
+    </div>
+
+    <div class="group">
+      <h2>7 · Export size</h2>
+      <div id="sizeRow" class="chips wrap" role="group" aria-label="Export size"></div>
+      <p class="hint">Exports are exact PNGs: 1080×1080, 1080×1350 or 1920×1080.</p>
+    </div>
+  </section>
+
+  <section class="stage" aria-label="Live preview">
+    <canvas id="preview" width="1920" height="1080" aria-label="Live cover preview"></canvas>
+    <p id="status" role="status"></p>
+    <p class="fine">All art on the cover is drawn by this app — sun, palms and skyline included. Fonts: Anton &amp; Pacifico (SIL Open Font License).</p>
+  </section>
+</main>
+<script type="module" src="./src/main.js"></script>
+</body>
+</html>
