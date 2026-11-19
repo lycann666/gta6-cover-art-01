@@ -3,87 +3,96 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vice Cover Studio — GTA 6-style cover art maker</title>
+<title>Vice Cover — GTA 6-style poster maker</title>
 <link rel="stylesheet" href="./style.css">
 </head>
 <body>
 <header class="topbar">
-  <div class="brand">
-    <h1>Vice Cover Studio</h1>
-    <p>Turn your photos into a GTA-style poster cover. Original art — no Rockstar logos, artwork or fonts.</p>
-  </div>
-  <div class="top-actions">
-    <button id="undo" type="button" disabled>↶ Undo</button>
-    <button id="redo" type="button" disabled>↷ Redo</button>
-    <button id="exportBtn" type="button" class="primary">Export PNG ↓</button>
-  </div>
+  <div class="brand"><span class="brand-mark">VC</span><span class="brand-name">VICE COVER</span></div>
+  <p class="tagline">Turn your photo into a sunset-poster cover. 100% offline — photos never leave this machine.</p>
 </header>
 <main class="app">
-  <section class="controls" aria-label="Cover controls">
+  <section class="panel" aria-label="Editor">
+    <h1>Make your cover</h1>
+    <ol class="steps">
+      <li>Add a photo</li>
+      <li>Pick a layout &amp; grade</li>
+      <li>Write the caption</li>
+      <li>Export PNG</li>
+    </ol>
+
     <div class="group">
       <h2>1 · Photos</h2>
-      <label class="upload">Add your photos
-        <input id="upload" type="file" accept="image/*" multiple>
+      <label class="file">Photo A (hero)
+        <input id="photoA" type="file" accept="image/*">
       </label>
-      <div class="sample-row">
-        <button type="button" data-sample="boulevard">Load sample · Boulevard</button>
-        <button type="button" data-sample="pier">Load sample · Pier</button>
+      <label class="file">Photo B (side panels)
+        <input id="photoB" type="file" accept="image/*">
+      </label>
+      <button id="useSamples" type="button" class="ghost">Try the sample photos</button>
+      <p class="hint">Your photos are read with FileReader and stay on your machine. Nothing is uploaded.</p>
+    </div>
+
+    <div class="group">
+      <h2>2 · Layout</h2>
+      <div class="row" id="layouts">
+        <button type="button" data-layout="hero" class="chip active">Hero + sides</button>
+        <button type="button" data-layout="grid" class="chip">Four grid</button>
+        <button type="button" data-layout="full" class="chip">Full bleed</button>
       </div>
-      <div id="photoStrip" class="strip" aria-label="Your photos"></div>
-      <p class="hint">Click a photo to put it in the selected panel. Photos stay on your machine — nothing is uploaded.</p>
-    </div>
-
-    <div class="group">
-      <h2>2 · Panels</h2>
-      <div id="panelChips" class="chips" aria-label="Panels"></div>
-      <label>Zoom in panel
-        <input id="zoom" type="range" min="1" max="3" step="0.05" value="1">
-        <span id="zoomVal">100%</span>
-      </label>
-      <p>Selected panel photo: <strong id="panelPhoto">—</strong></p>
-      <div class="row">
-        <button id="fillAll" type="button">Fill all panels with this photo</button>
-        <button id="resetCrop" type="button">Reset crop</button>
+      <h2>Colour grade</h2>
+      <div class="row" id="grades">
+        <button type="button" data-grade="sunset" class="chip active">Vice Sunset</button>
+        <button type="button" data-grade="neon" class="chip">Neon Night</button>
+        <button type="button" data-grade="day" class="chip">Palm Day</button>
       </div>
-      <p class="hint">Drag a photo inside the preview to reposition it. Click a panel to select it.</p>
     </div>
 
     <div class="group">
-      <h2>3 · Layout</h2>
-      <div id="layoutRow" class="chips wrap" role="group" aria-label="Layout"></div>
-    </div>
-
-    <div class="group">
-      <h2>4 · Colour grade</h2>
-      <div id="gradeRow" class="chips wrap" role="group" aria-label="Colour grade"></div>
-    </div>
-
-    <div class="group">
-      <h2>5 · Motif</h2>
-      <div id="motifRow" class="chips wrap" role="group" aria-label="Motif"></div>
-    </div>
-
-    <div class="group">
-      <h2>6 · Caption</h2>
-      <label>Big title
-        <input id="titleInput" type="text" maxlength="24" value="VICE SUNSET">
+      <h2>3 · Caption</h2>
+      <label>Main caption
+        <input id="caption" type="text" maxlength="28" value="Sunset Heist">
       </label>
-      <label>Script subtitle
-        <input id="subtitleInput" type="text" maxlength="40" value="a vice city story">
+      <label>Sub-caption
+        <input id="sub" type="text" maxlength="40" value="Vice City Nights">
       </label>
     </div>
 
     <div class="group">
-      <h2>7 · Export size</h2>
-      <div id="sizeRow" class="chips wrap" role="group" aria-label="Export size"></div>
-      <p class="hint">Exports are exact PNGs: 1080×1080, 1080×1350 or 1920×1080.</p>
+      <h2>Adjust a panel</h2>
+      <div class="row" id="panelPick"></div>
+      <label>Photo in this panel
+        <select id="panelSrc">
+          <option value="a">Photo A</option>
+          <option value="b">Photo B</option>
+        </select>
+      </label>
+      <label>Zoom <span id="zoomVal">1.00×</span>
+        <input id="panelZoom" type="range" min="1" max="2.5" step="0.05" value="1">
+      </label>
+      <label>Move left / right
+        <input id="panelDx" type="range" min="-0.4" max="0.4" step="0.01" value="0">
+      </label>
+      <label>Move up / down
+        <input id="panelDy" type="range" min="-0.4" max="0.4" step="0.01" value="0">
+      </label>
+    </div>
+
+    <div class="group">
+      <h2>4 · Export PNG</h2>
+      <div class="row" id="sizes">
+        <button type="button" data-w="1080" data-h="1080" class="chip size active">1080 × 1080</button>
+        <button type="button" data-w="1080" data-h="1350" class="chip size">1080 × 1350</button>
+        <button type="button" data-w="1920" data-h="1080" class="chip size">1920 × 1080</button>
+      </div>
+      <button id="export" type="button" class="big">Export PNG</button>
+      <p id="status" role="status"></p>
     </div>
   </section>
 
   <section class="stage" aria-label="Live preview">
-    <canvas id="preview" width="1920" height="1080" aria-label="Live cover preview"></canvas>
-    <p id="status" role="status"></p>
-    <p class="fine">All art on the cover is drawn by this app — sun, palms and skyline included. Fonts: Anton &amp; Pacifico (SIL Open Font License).</p>
+    <canvas id="cover" width="1080" height="1080"></canvas>
+    <p class="hint">Live preview — what you see is what the PNG looks like.</p>
   </section>
 </main>
 <script type="module" src="./src/main.js"></script>
