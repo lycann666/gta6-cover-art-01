@@ -1,36 +1,40 @@
-// Vice City Cover Maker — the entry program for gta6-cover-art-01 (Node 22, stdlib only).
-// It hands the app in: copies this repo's app/ and screenshots/ into /output and writes
-// /output/dossier.json with buildDossier from the kit's vendored library. Run it locally with:
+// Vice City Cover Maker — submission entrypoint (Node 22, standard library only).
+// Hands the entry in: copies this repo's app/ and screenshots/ into the output
+// directory and writes /output/dossier.json with the kit's vendored library.
+// The app itself is plain static files under app/ (index.html + ES modules +
+// bundled fonts and samples) that run offline in a desktop browser.
+// Outside the grader, MAKEFUN_OUTPUT_DIR stands in for /output:
 //   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
-// The grader runs it with /output as the destination and no network, so it only uses the
-// Node standard library and the vendored makefun-app.ts that ships in this repo.
 
-import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildDossier } from './vendor/makefun-app.ts';
 
-// Resolve the repo root from this file's own URL, so the program works wherever it is run from.
+// Directory holding this file (the repo root), resolved from the module URL.
 const repoRoot = fileURLToPath(new URL('.', import.meta.url));
-const outputDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
+const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
 
-// Start from a clean destination so a stale file from an earlier run can never leak in.
-mkdirSync(outputDir, { recursive: true });
-rmSync(join(outputDir, 'app'), { recursive: true, force: true });
-rmSync(join(outputDir, 'screenshots'), { recursive: true, force: true });
-cpSync(join(repoRoot, 'app'), join(outputDir, 'app'), { recursive: true });
-if (existsSync(join(repoRoot, 'screenshots'))) {
-  cpSync(join(repoRoot, 'screenshots'), join(outputDir, 'screenshots'), { recursive: true });
+function copyTree(from, to) {
+  if (!existsSync(from)) return;
+  mkdirSync(to, { recursive: true });
+  cpSync(from, to, { recursive: true });
 }
 
-// The dossier is the judge's view of the entry: the same caps the scorer enforces,
-// so a dossier that builds here is one the gate accepts.
-const dossier = buildDossier(outputDir, {
+mkdirSync(outDir, { recursive: true });
+copyTree(join(repoRoot, 'app'), join(outDir, 'app'));
+copyTree(join(repoRoot, 'screenshots'), join(outDir, 'screenshots'));
+
+// The scorer's own caps: text_max_bytes shapes the dossier text; the rest
+// refuse an entry the scorer would refuse (over 4 screenshots or one over
+// 256 KiB; over 993 app files or 48 MiB of app files; an app path over
+// 1000 bytes). Our app is far inside all of them.
+const dossier = buildDossier(outDir, {
   text_max_bytes: 163840,
   screenshots: { max: 4, max_bytes: 262144 },
   app_max_files: 993,
   app_max_bytes: 50331648,
   app_path_max_bytes: 1000,
 });
-writeFileSync(join(outputDir, 'dossier.json'), dossier);
-console.log(`Vice City Cover Maker handed in to ${outputDir}`);
+writeFileSync(join(outDir, 'dossier.json'), dossier);
+console.log(`Vice City Cover Maker handed in: ${outDir} (dossier ${dossier.length} bytes).`);

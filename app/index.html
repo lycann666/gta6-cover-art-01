@@ -1,93 +1,118 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vice City Cover Maker</title>
-<link rel="stylesheet" href="./style.css">
+<title>Vice City Cover Maker — GTA-style cover art from your photo</title>
+<meta name="description" content="Turn your own photo into striking GTA-style multi-panel cover art with bold caption lettering and a sunset or neon grade. Export PNG 1080x1080, 1080x1350 or 1920x1080. Free, offline, no upload.">
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="topbar">
-  <div class="brand"><span class="brand-sun" aria-hidden="true"></span>
-    <div><strong>VICE CITY COVER MAKER</strong><span>Turn your photo into GTA-style poster art</span></div>
+  <div class="brand">
+    <span class="brand-mark">VC</span>
+    <div>
+      <h1>Vice City Cover Maker</h1>
+      <p class="tagline">Your photo &rarr; GTA-style cover art. Free, offline, nothing uploaded.</p>
+    </div>
   </div>
-  <p class="tagline">Neon nights. Palm shadows. Your face on the poster.</p>
+  <p class="steps">1 &nbsp;Add a photo&nbsp;&nbsp; 2 &nbsp;Crop &amp; caption&nbsp;&nbsp; 3 &nbsp;Export PNG</p>
 </header>
-<main class="studio">
-  <section class="panel controls" aria-label="Cover controls">
-    <h2>1 · Photos</h2>
-    <p class="hint">Load your own photo, or tap a sample. Click a panel below the preview to pick which one you are editing.</p>
-    <div class="row">
-      <label class="filebtn">Load a photo
-        <input id="photoFile" type="file" accept="image/*">
+
+<main class="layout">
+  <section class="controls" aria-label="Cover controls">
+    <div class="card">
+      <h2>1 &middot; Your photos</h2>
+      <p class="hint">Photos stay on your machine — they are never uploaded.</p>
+      <div class="photo-row">
+        <label class="upload-btn">Upload Photo A
+          <input type="file" id="uploadA" accept="image/*">
+        </label>
+        <label class="upload-btn">Upload Photo B
+          <input type="file" id="uploadB" accept="image/*">
+        </label>
+      </div>
+      <p class="hint">Or try a sample:</p>
+      <div class="photo-row">
+        <button type="button" data-sample="pier" data-slot="0">Pier &rarr; A</button>
+        <button type="button" data-sample="boulevard" data-slot="0">Boulevard &rarr; A</button>
+        <button type="button" data-sample="pier" data-slot="1">Pier &rarr; B</button>
+        <button type="button" data-sample="boulevard" data-slot="1">Boulevard &rarr; B</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>2 &middot; Crop &amp; position</h2>
+      <div id="slotTabs" class="tabs">
+        <button type="button" data-slot="0" class="active">Photo A</button>
+        <button type="button" data-slot="1">Photo B</button>
+      </div>
+      <p id="slotLabel" class="hint">Editing Photo A (main panel)</p>
+      <label class="slider-label">Zoom
+        <input type="range" id="zoomRange" min="1" max="2.5" step="0.05" value="1">
       </label>
-      <button id="sampleBoulevard" type="button" class="ghost">Sample: Boulevard</button>
-      <button id="samplePier" type="button" class="ghost">Sample: Pier</button>
-    </div>
-    <div class="row">
-      <button id="fillAll" type="button">Fill all panels with this photo</button>
-      <button id="fillSelected" type="button" class="ghost">Fill selected panel only</button>
-    </div>
-
-    <h2>2 · Layout</h2>
-    <div class="choices" id="layoutChoices" role="group" aria-label="Layout">
-      <button type="button" data-layout="grid" class="choice active">Four-panel grid</button>
-      <button type="button" data-layout="hero" class="choice">Hero + three</button>
-      <button type="button" data-layout="full" class="choice">Full-bleed single</button>
-      <button type="button" data-layout="tilted" class="choice">Tilted snapshots</button>
+      <label class="slider-label">Move left / right
+        <input type="range" id="panXRange" min="-1" max="1" step="0.05" value="0">
+      </label>
+      <label class="slider-label">Move up / down
+        <input type="range" id="panYRange" min="-1" max="1" step="0.05" value="0">
+      </label>
     </div>
 
-    <h2>3 · Colour grade</h2>
-    <div class="choices" id="gradeChoices" role="group" aria-label="Colour grade">
-      <button type="button" data-grade="sunset" class="choice active"><span class="swatch sunset"></span>Vice City sunset</button>
-      <button type="button" data-grade="neon" class="choice"><span class="swatch neon"></span>Neon nights</button>
-      <button type="button" data-grade="noir" class="choice"><span class="swatch noir"></span>Palm noir</button>
-      <button type="button" data-grade="pastel" class="choice"><span class="swatch pastel"></span>Pastel Vice</button>
+    <div class="card">
+      <h2>3 &middot; Caption</h2>
+      <label class="field-label">Big caption
+        <input type="text" id="captionInput" value="Sunset Heist" maxlength="24">
+      </label>
+      <label class="field-label">Script accent
+        <input type="text" id="subInput" value="Vice City" maxlength="24">
+      </label>
     </div>
 
-    <h2>4 · Crop the selected panel</h2>
-    <p class="hint">Selected panel: <strong id="selectedLabel">Panel 1</strong></p>
-    <label>Zoom <span id="zoomVal">1.20×</span>
-      <input id="zoom" type="range" min="1" max="3" step="0.05" value="1.2">
-    </label>
-    <label>Pan left–right <span id="panXVal">0</span>
-      <input id="panX" type="range" min="-100" max="100" step="1" value="0">
-    </label>
-    <label>Pan up–down <span id="panYVal">0</span>
-      <input id="panY" type="range" min="-100" max="100" step="1" value="0">
-    </label>
-
-    <h2>5 · Caption</h2>
-    <label>Title
-      <input id="title" type="text" maxlength="28" value="VICE CITY">
-    </label>
-    <label>Subtitle
-      <input id="subtitle" type="text" maxlength="40" value="one night in the neon">
-    </label>
-    <label class="check"><input id="showSun" type="checkbox" checked> Retro slatted sun</label>
-    <label class="check"><input id="showPalms" type="checkbox" checked> Palm-tree silhouettes</label>
-    <label class="check"><input id="showSkyline" type="checkbox" checked> City skyline</label>
-
-    <h2>6 · Export PNG</h2>
-    <div class="row exportrow">
-      <button id="exportSquare" type="button" class="export">1080 × 1080</button>
-      <button id="exportPortrait" type="button" class="export">1080 × 1350</button>
-      <button id="exportWide" type="button" class="export">1920 × 1080</button>
+    <div class="card">
+      <h2>4 &middot; Panels</h2>
+      <div class="btn-grid">
+        <button type="button" data-layout="hero">Hero</button>
+        <button type="button" data-layout="duo" class="active">Duo</button>
+        <button type="button" data-layout="trio">Trio</button>
+        <button type="button" data-layout="grid">Grid</button>
+      </div>
+      <p class="hint">Duo and Grid fill several panels with one photo or two.</p>
     </div>
-    <p id="status" role="status">Load a photo to begin — or tap a sample.</p>
+
+    <div class="card">
+      <h2>5 &middot; Colour grade</h2>
+      <div class="btn-grid">
+        <button type="button" data-grade="sunset" class="active">Sunset</button>
+        <button type="button" data-grade="neon">Neon Nights</button>
+        <button type="button" data-grade="vice">Vice Pastel</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>6 &middot; Export size</h2>
+      <div class="btn-grid">
+        <button type="button" data-size="square">1080 &times; 1080</button>
+        <button type="button" data-size="portrait">1080 &times; 1350</button>
+        <button type="button" data-size="wide" class="active">1920 &times; 1080</button>
+      </div>
+      <button type="button" id="exportBtn" class="export-btn">Export cover PNG</button>
+      <p id="statusLine" class="status" role="status"></p>
+    </div>
   </section>
 
-  <section class="panel preview" aria-label="Cover preview">
-    <div class="preview-head">
-      <h2>Live preview</h2>
-      <span id="sizeLabel">1080 × 1080</span>
-    </div>
-    <canvas id="cover" width="1080" height="1080" aria-label="The cover art preview"></canvas>
-    <div class="paneltabs" id="panelTabs" aria-label="Choose a panel to edit"></div>
-    <p class="hint">Tip: the title block, sun, palms and skyline are drawn by the app — no game artwork, no game fonts. Fonts are Anton and Pacifico under the SIL Open Font License.</p>
+  <section id="stage" class="stage" aria-label="Live preview">
+    <canvas id="preview" width="1920" height="1080"></canvas>
+    <p class="stage-note">Live preview — what you see is the PNG you export.</p>
   </section>
 </main>
-<footer class="foot">Made with your own photos, on your own machine. Nothing is uploaded.</footer>
-<script type="module" src="./src/main.js"></script>
+
+<footer class="foot">
+  <p>Fan-made cover maker. No Rockstar Games logo, artwork or fonts.
+  Lettering: Anton &amp; Pacifico, SIL Open Font License (see app/fonts/OFL.txt).
+  Sample photos were made with an image model for make.fun and are free to use.</p>
+</footer>
+
+<script type="module" src="src/main.js"></script>
 </body>
 </html>
