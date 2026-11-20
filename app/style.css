@@ -1,251 +1,89 @@
-/* Vice City Cover Maker — editor styles.
-   Sunset / neon grade, Anton headlines, Pacifico script accent.
-   Fonts are bundled under app/fonts/ (SIL Open Font License). */
-
 @font-face {
   font-family: 'Anton';
-  src: url('fonts/Anton-Regular.ttf') format('truetype');
-  font-weight: 400;
   font-style: normal;
+  font-weight: 400;
   font-display: swap;
+  src: url('./fonts/Anton-Regular.woff2') format('woff2');
 }
-
 @font-face {
   font-family: 'Pacifico';
-  src: url('fonts/Pacifico-Regular.ttf') format('truetype');
-  font-weight: 400;
   font-style: normal;
+  font-weight: 400;
   font-display: swap;
+  src: url('./fonts/Pacifico-Regular.woff2') format('woff2');
 }
 
 :root {
   --bg: #12081f;
-  --panel: #1d1033;
-  --panel-2: #261545;
-  --ink: #fff7ef;
-  --muted: #c9b8e8;
-  --line: #3d2566;
-  --pink: #ff2e63;
-  --orange: #ff9a3d;
-  --cyan: #00e5ff;
-  --gold: #ffb03a;
+  --panel: #241238;
+  --panel-2: #2e1846;
+  --ink: #f5eefc;
+  --muted: #b9a6d4;
+  --pink: #ff2e88;
+  --orange: #ffb703;
+  --line: #4a2d6b;
 }
 
 * { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  background:
-    radial-gradient(900px 500px at 85% -10%, rgba(255, 46, 99, 0.28), transparent 60%),
-    radial-gradient(800px 480px at 0% 0%, rgba(0, 229, 255, 0.14), transparent 55%),
-    var(--bg);
-  color: var(--ink);
-  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-  min-height: 100vh;
-}
+html, body { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); font: 15px/1.45 system-ui, sans-serif; }
 
 .topbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 24px;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 28px 12px;
-  border-bottom: 2px solid var(--line);
+  display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between;
+  padding: 14px 24px; border-bottom: 2px solid var(--line);
+  background: linear-gradient(90deg, #1d0b33, #2b0f45 55%, #3d1157);
 }
-
-.brand { display: flex; align-items: center; gap: 14px; }
-
-.brand-mark {
-  font-family: 'Anton', sans-serif;
-  font-size: 34px;
-  line-height: 1;
-  color: #12081f;
-  background: linear-gradient(135deg, var(--gold), var(--pink) 55%, #7b2ff7);
-  padding: 10px 12px;
-  border-radius: 8px;
-  transform: rotate(-3deg);
-  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.45);
+.brand { display: flex; gap: 14px; align-items: center; }
+.logo {
+  display: grid; place-items: center; width: 52px; height: 52px; border-radius: 12px;
+  font-family: 'Anton', sans-serif; font-size: 26px; color: #fff;
+  background: linear-gradient(135deg, #ff7a18, #ff2e88 55%, #7b2ff7);
+  box-shadow: 0 4px 18px rgba(255, 46, 136, 0.45);
 }
+.brand h1 { margin: 0; font-family: 'Anton', sans-serif; font-size: 30px; letter-spacing: 1px; }
+.brand p { margin: 2px 0 0; color: var(--muted); }
+.steps { display: flex; gap: 18px; list-style: none; margin: 0; padding: 0; font-family: 'Pacifico', cursive; font-size: 17px; color: var(--orange); }
+.steps li { display: flex; gap: 6px; align-items: baseline; }
+.steps b { font-family: 'Anton', sans-serif; color: #fff; }
 
-h1 {
-  font-family: 'Anton', sans-serif;
-  font-weight: 400;
-  font-size: 30px;
-  letter-spacing: 0.5px;
-  margin: 0;
-  text-transform: uppercase;
+.app { display: flex; gap: 24px; align-items: flex-start; justify-content: center; padding: 22px 24px 32px; }
+.controls { display: flex; flex-direction: column; gap: 16px; width: 340px; flex: none; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.card h2 { margin: 0; font-family: 'Anton', sans-serif; font-size: 19px; letter-spacing: 0.5px; color: var(--orange); }
+.card p { margin: 0; color: var(--muted); font-size: 14px; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; }
+label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 14px; }
+input[type=text], select {
+  font: inherit; padding: 9px 10px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--panel-2); color: var(--ink);
 }
-
-.tagline { margin: 2px 0 0; color: var(--muted); font-size: 14px; }
-
-.steps {
-  font-family: 'Pacifico', cursive;
-  font-size: 19px;
-  color: var(--gold);
-  margin: 0;
-  text-shadow: 0 0 14px rgba(255, 176, 58, 0.55);
-}
-
-.layout {
-  display: grid;
-  grid-template-columns: 360px 1fr;
-  gap: 22px;
-  padding: 22px 28px;
-  align-items: start;
-}
-
-.controls { display: flex; flex-direction: column; gap: 14px; }
-
-.card {
-  background: linear-gradient(180deg, var(--panel-2), var(--panel));
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 14px 16px;
-}
-
-.card h2 {
-  font-family: 'Anton', sans-serif;
-  font-weight: 400;
-  font-size: 17px;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  margin: 0 0 8px;
-  color: var(--gold);
-}
-
-.hint { color: var(--muted); font-size: 13px; margin: 6px 0; }
-
-.photo-row { display: flex; flex-wrap: wrap; gap: 8px; }
-
-.upload-btn {
-  display: inline-block;
-  background: var(--pink);
-  color: #fff;
-  font-weight: 700;
-  font-size: 14px;
-  padding: 9px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  border: none;
-}
-
-.upload-btn input { display: none; }
-
+input[type=range] { width: 100%; accent-color: var(--pink); }
 button {
-  font: inherit;
-  color: var(--ink);
-  background: #33205c;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 8px 12px;
-  cursor: pointer;
+  font: inherit; font-weight: 700; padding: 9px 14px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--panel-2); color: var(--ink); cursor: pointer;
 }
-
 button:hover { border-color: var(--pink); }
 button.active { background: var(--pink); border-color: var(--pink); color: #fff; }
+button.primary { background: linear-gradient(90deg, #ff7a18, #ff2e88); border: 0; color: #fff; font-size: 16px; padding: 12px; }
+.upload { cursor: pointer; }
+.upload input { display: none; }
+.fineprint { font-size: 12px; }
 
-.btn-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-.tabs { display: flex; gap: 8px; }
-
-.slider-label, .field-label {
-  display: block;
-  font-size: 13px;
-  color: var(--muted);
-  margin: 8px 0;
+.preview { flex: 1; max-width: 860px; display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.preview p { margin: 0; color: var(--muted); }
+#cover {
+  width: min(100%, 78vh); height: auto; aspect-ratio: 1 / 1;
+  border-radius: 6px; box-shadow: 0 12px 44px rgba(0, 0, 0, 0.55);
+  background: #160a2e;
 }
+#status { min-height: 1.2em; color: var(--orange); }
 
-.slider-label input[type='range'] { width: 100%; accent-color: var(--pink); }
-
-.field-label input[type='text'] {
-  display: block;
-  width: 100%;
-  margin-top: 4px;
-  padding: 9px 10px;
-  font: inherit;
-  font-size: 15px;
-  color: var(--ink);
-  background: #12081f;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-
-.export-btn {
-  width: 100%;
-  margin-top: 10px;
-  padding: 13px;
-  font-family: 'Anton', sans-serif;
-  font-size: 19px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: #12081f;
-  background: linear-gradient(90deg, var(--gold), var(--pink));
-  border: none;
-  border-radius: 10px;
-  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.45);
-}
-
-.status { min-height: 20px; color: var(--cyan); font-size: 13px; margin: 8px 0 0; }
-
-.stage {
-  position: sticky;
-  top: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  min-height: 420px;
-  padding: 18px;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-}
-
-#preview {
-  max-width: 100%;
-  height: auto;
-  border-radius: 6px;
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
-  background: #000;
-}
-
-.stage-note { color: var(--muted); font-size: 13px; margin: 0; }
-
-.foot {
-  padding: 8px 28px 22px;
-  color: var(--muted);
-  font-size: 12.5px;
-}
-
-/* Screenshot modes: hide the editor chrome so the shot is just the art. */
-body.shot-cover .topbar,
-body.shot-cover .controls,
-body.shot-cover .foot,
-body.shot-cover .stage-note { display: none; }
-
-body.shot-cover { background: #0d0518; }
-
-body.shot-cover .layout {
-  display: block;
-  padding: 0;
-}
-
-body.shot-cover .stage {
-  position: static;
-  min-height: 100vh;
-  border: none;
-  border-radius: 0;
-  padding: 0;
-  justify-content: center;
-  background: #0d0518;
-}
-
-body.shot-cover #preview {
-  border-radius: 0;
-  box-shadow: none;
-}
+body.shot-cover .topbar, body.shot-cover .controls, body.shot-cover .preview p { display: none; }
+body.shot-cover .app { padding: 0; display: block; }
+body.shot-cover .preview { max-width: none; }
+body.shot-cover #cover { width: 100vw; height: 100vh; max-width: none; border-radius: 0; box-shadow: none; aspect-ratio: auto; object-fit: fill; }
 
 @media (max-width: 900px) {
-  .layout { grid-template-columns: 1fr; }
-  .stage { position: static; }
+  .app { flex-direction: column; }
+  .controls { width: 100%; }
+  .brand h1 { font-size: 24px; }
 }

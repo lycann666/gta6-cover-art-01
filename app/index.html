@@ -1,118 +1,89 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Vice City Cover Maker — GTA-style cover art from your photo</title>
-<meta name="description" content="Turn your own photo into striking GTA-style multi-panel cover art with bold caption lettering and a sunset or neon grade. Export PNG 1080x1080, 1080x1350 or 1920x1080. Free, offline, no upload.">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="./style.css">
 </head>
 <body>
 <header class="topbar">
-  <div class="brand">
-    <span class="brand-mark">VC</span>
+  <div class="brand"><span class="logo">VC</span>
     <div>
-      <h1>Vice City Cover Maker</h1>
-      <p class="tagline">Your photo &rarr; GTA-style cover art. Free, offline, nothing uploaded.</p>
+      <h1>VICE CITY COVER MAKER</h1>
+      <p>Your photo &rarr; GTA-style cover art. Free, offline, nothing uploaded.</p>
     </div>
   </div>
-  <p class="steps">1 &nbsp;Add a photo&nbsp;&nbsp; 2 &nbsp;Crop &amp; caption&nbsp;&nbsp; 3 &nbsp;Export PNG</p>
+  <ol class="steps">
+    <li><b>1</b> <span>Add a photo</span></li>
+    <li><b>2</b> <span>Crop &amp; caption</span></li>
+    <li><b>3</b> <span>Export PNG</span></li>
+  </ol>
 </header>
-
-<main class="layout">
+<main class="app">
   <section class="controls" aria-label="Cover controls">
     <div class="card">
       <h2>1 &middot; Your photos</h2>
-      <p class="hint">Photos stay on your machine — they are never uploaded.</p>
-      <div class="photo-row">
-        <label class="upload-btn">Upload Photo A
-          <input type="file" id="uploadA" accept="image/*">
-        </label>
-        <label class="upload-btn">Upload Photo B
-          <input type="file" id="uploadB" accept="image/*">
-        </label>
+      <p>Photos stay on your machine &mdash; they are never uploaded.</p>
+      <div class="row">
+        <label class="upload">Upload Photo A <input id="photoA" type="file" accept="image/*"></label>
+        <label class="upload">Upload Photo B <input id="photoB" type="file" accept="image/*"></label>
       </div>
-      <p class="hint">Or try a sample:</p>
-      <div class="photo-row">
-        <button type="button" data-sample="pier" data-slot="0">Pier &rarr; A</button>
-        <button type="button" data-sample="boulevard" data-slot="0">Boulevard &rarr; A</button>
-        <button type="button" data-sample="pier" data-slot="1">Pier &rarr; B</button>
-        <button type="button" data-sample="boulevard" data-slot="1">Boulevard &rarr; B</button>
+      <p>Or try a sample:</p>
+      <div class="row">
+        <button id="samplePierA" type="button">Pier &rarr; A</button>
+        <button id="sampleBlvdA" type="button">Boulevard &rarr; A</button>
+        <button id="samplePierB" type="button">Pier &rarr; B</button>
+        <button id="sampleBlvdB" type="button">Boulevard &rarr; B</button>
       </div>
     </div>
-
     <div class="card">
       <h2>2 &middot; Crop &amp; position</h2>
-      <div id="slotTabs" class="tabs">
-        <button type="button" data-slot="0" class="active">Photo A</button>
-        <button type="button" data-slot="1">Photo B</button>
+      <div class="row">
+        <button id="editA" type="button" class="active">Photo A</button>
+        <button id="editB" type="button">Photo B</button>
       </div>
-      <p id="slotLabel" class="hint">Editing Photo A (main panel)</p>
-      <label class="slider-label">Zoom
-        <input type="range" id="zoomRange" min="1" max="2.5" step="0.05" value="1">
-      </label>
-      <label class="slider-label">Move left / right
-        <input type="range" id="panXRange" min="-1" max="1" step="0.05" value="0">
-      </label>
-      <label class="slider-label">Move up / down
-        <input type="range" id="panYRange" min="-1" max="1" step="0.05" value="0">
-      </label>
+      <p id="cropLabel">Editing Photo A (main panel)</p>
+      <label>Zoom <input id="zoom" type="range" min="1" max="2.5" step="0.05" value="1"></label>
+      <label>Move left / right <input id="panx" type="range" min="-0.5" max="0.5" step="0.02" value="0"></label>
+      <label>Move up / down <input id="pany" type="range" min="-0.5" max="0.5" step="0.02" value="0"></label>
     </div>
-
     <div class="card">
-      <h2>3 &middot; Caption</h2>
-      <label class="field-label">Big caption
-        <input type="text" id="captionInput" value="Sunset Heist" maxlength="24">
+      <h2>3 &middot; Caption &amp; style</h2>
+      <label>Caption <input id="caption" type="text" maxlength="32" value="Sunset Heist"></label>
+      <label>Script accent <input id="accent" type="text" maxlength="20" value="Vice City"></label>
+      <label>Layout
+        <select id="layout">
+          <option value="hero">Hero — one big photo</option>
+          <option value="duo" selected>Duo — photo + accent panel</option>
+          <option value="trio">Trio — big photo + two panels</option>
+          <option value="grid">Grid — four comic panels</option>
+        </select>
       </label>
-      <label class="field-label">Script accent
-        <input type="text" id="subInput" value="Vice City" maxlength="24">
+      <label>Colour grade
+        <select id="grade">
+          <option value="sunset" selected>Sunset</option>
+          <option value="neon">Neon Nights</option>
+          <option value="pastel">Vice Pastel</option>
+        </select>
       </label>
-    </div>
-
-    <div class="card">
-      <h2>4 &middot; Panels</h2>
-      <div class="btn-grid">
-        <button type="button" data-layout="hero">Hero</button>
-        <button type="button" data-layout="duo" class="active">Duo</button>
-        <button type="button" data-layout="trio">Trio</button>
-        <button type="button" data-layout="grid">Grid</button>
-      </div>
-      <p class="hint">Duo and Grid fill several panels with one photo or two.</p>
-    </div>
-
-    <div class="card">
-      <h2>5 &middot; Colour grade</h2>
-      <div class="btn-grid">
-        <button type="button" data-grade="sunset" class="active">Sunset</button>
-        <button type="button" data-grade="neon">Neon Nights</button>
-        <button type="button" data-grade="vice">Vice Pastel</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>6 &middot; Export size</h2>
-      <div class="btn-grid">
-        <button type="button" data-size="square">1080 &times; 1080</button>
-        <button type="button" data-size="portrait">1080 &times; 1350</button>
-        <button type="button" data-size="wide" class="active">1920 &times; 1080</button>
-      </div>
-      <button type="button" id="exportBtn" class="export-btn">Export cover PNG</button>
-      <p id="statusLine" class="status" role="status"></p>
+      <label>Export size
+        <select id="size">
+          <option value="square">1080 &times; 1080 (square)</option>
+          <option value="portrait">1080 &times; 1350 (portrait)</option>
+          <option value="wide" selected>1920 &times; 1080 (wide)</option>
+        </select>
+      </label>
+      <button id="export" type="button" class="primary">Export PNG</button>
+      <p id="status" role="status"></p>
+      <p class="fineprint">Fan-made cover art from your own photos. Original art only &mdash; no Rockstar assets, logos or official art.</p>
     </div>
   </section>
-
-  <section id="stage" class="stage" aria-label="Live preview">
-    <canvas id="preview" width="1920" height="1080"></canvas>
-    <p class="stage-note">Live preview — what you see is the PNG you export.</p>
+  <section class="preview" aria-label="Live preview">
+    <canvas id="cover" width="1080" height="1080" aria-label="The cover"></canvas>
+    <p>Live preview &mdash; what you see is the PNG you export.</p>
   </section>
 </main>
-
-<footer class="foot">
-  <p>Fan-made cover maker. No Rockstar Games logo, artwork or fonts.
-  Lettering: Anton &amp; Pacifico, SIL Open Font License (see app/fonts/OFL.txt).
-  Sample photos were made with an image model for make.fun and are free to use.</p>
-</footer>
-
-<script type="module" src="src/main.js"></script>
+<script type="module" src="./src/main.js"></script>
 </body>
 </html>

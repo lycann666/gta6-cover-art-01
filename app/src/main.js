@@ -1,244 +1,183 @@
-// Vice City Cover Maker — editor wiring and screenshot ("shot") mode.
-// Loads the user's photos (or the bundled samples), keeps the live preview
-// in sync with every control, and exports the cover as a PNG.
-// Shot mode (?shot=cover / ?shot=editor) renders a fixed cover for screenshots.
+// Vice City Cover Maker — page wiring, written fresh for round 4.
+// Uploads or sample photos, layout/grade/crop/caption controls, live preview
+// on canvas, PNG export at 1080x1080, 1080x1350 or 1920x1080.
+// `?shot=cover|editor` sets up a fixed scene for a screenshot instead and
+// sets window.__shotReady once it has painted.
+import { drawCover, LAYOUTS, GRADES } from './cover.js';
 
-import { drawCover, exportCoverPNG, emptyPhoto, SIZES, LAYOUTS, GRADES } from './cover.js';
-
-const $ = (sel) => document.querySelector(sel);
-const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+const $ = (id) => document.getElementById(id);
+const canvas = $('cover');
+const statusEl = $('status');
 
 const state = {
-  photos: [emptyPhoto(), emptyPhoto()],
+  photoA: null,
+  photoB: null,
   layout: 'duo',
   grade: 'sunset',
-  size: 'wide',
   caption: 'Sunset Heist',
-  sub: 'Vice City',
-  activeSlot: 0,
+  accent: 'Vice City',
+  cropA: { zoom: 1, dx: 0, dy: 0 },
+  cropB: { zoom: 1, dx: 0, dy: 0 },
+  editing: 'A',
 };
 
-const preview = $('#preview');
-let drawQueued = false;
+const EXPORT_SIZES = {
+  square: [1080, 1080],
+  portrait: [1080, 1350],
+  wide: [1920, 1080],
+};
 
-function queueDraw() {
-  if (drawQueued) return;
-  drawQueued = true;
-  requestAnimationFrame(() => {
-    drawQueued = false;
-    drawCover(preview, {
-      photos: state.photos,
-      layout: state.layout,
-      grade: state.grade,
-      caption: state.caption,
-      sub: state.sub,
-      size: SIZES[state.size],
-    });
-    fitPreviewToStage();
-    window.__coverReady = true;
-  });
-}
-
-function fitPreviewToStage() {
-  // In shot-cover mode the canvas fills the viewport; in the editor it fits
-  // the stage box while keeping its aspect ratio.
-  const stage = $('#stage');
-  if (!stage) return;
-  const box = stage.getBoundingClientRect();
-  const { w, h } = SIZES[state.size];
-  const scale = Math.min(box.width / w, box.height / h, 1.4);
-  preview.style.width = `${Math.round(w * scale)}px`;
-  preview.style.height = `${Math.round(h * scale)}px`;
-}
-
-function setStatus(text) {
-  const el = $('#statusLine');
-  if (el) el.textContent = text;
-}
-
-function loadImageFile(file, slot) {
-  const reader = new FileReader();
-  reader.onload = () => {
+/** Loads an image from a URL, resolving once it can be drawn. */
+export function loadImage(url) {
+  return new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = () => {
-      state.photos[slot] = { img, zoom: 1, ox: 0, oy: 0 };
-      state.activeSlot = slot;
-      syncSlotControls();
-      queueDraw();
-      setStatus(`Photo ${slot === 0 ? 'A' : 'B'} loaded — drag the sliders to crop and position it.`);
-    };
-    img.src = String(reader.result);
-  };
-  reader.readAsDataURL(file);
-}
-
-function loadSample(name, slot) {
-  const img = new Image();
-  img.onload = () => {
-    state.photos[slot] = { img, zoom: 1, ox: 0, oy: 0 };
-    state.activeSlot = slot;
-    syncSlotControls();
-    queueDraw();
-    setStatus(`Sample “${name}” loaded into Photo ${slot === 0 ? 'A' : 'B'}.`);
-  };
-  img.onerror = () => setStatus(`Could not load sample ${name}.`);
-  img.src = `samples/${name}.jpg`;
-}
-
-function syncSlotControls() {
-  const photo = state.photos[state.activeSlot];
-  const zoom = $('#zoomRange');
-  const panX = $('#panXRange');
-  const panY = $('#panYRange');
-  if (zoom) zoom.value = String(photo.zoom);
-  if (panX) panX.value = String(photo.ox);
-  if (panY) panY.value = String(photo.oy);
-  $$('#slotTabs button').forEach((btn) => {
-    btn.classList.toggle('active', Number(btn.dataset.slot) === state.activeSlot);
-  });
-  const label = $('#slotLabel');
-  if (label) {
-    label.textContent = state.activeSlot === 0
-      ? 'Editing Photo A (main panel)'
-      : 'Editing Photo B (side panel)';
-  }
-}
-
-function markActive(group, value) {
-  $$(`[data-${group}]`).forEach((btn) => {
-    btn.classList.toggle('active', btn.dataset[group] === value);
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error(`could not load ${url}`));
+    img.src = url;
   });
 }
 
-function bindControls() {
-  $('#captionInput').addEventListener('input', (e) => {
-    state.caption = e.target.value;
-    queueDraw();
-  });
-  $('#subInput').addEventListener('input', (e) => {
-    state.sub = e.target.value;
-    queueDraw();
-  });
-  $$('[data-layout]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      state.layout = btn.dataset.layout;
-      markActive('layout', state.layout);
-      queueDraw();
-      setStatus(`Layout: ${LAYOUTS[state.layout]}.`);
-    });
-  });
-  $$('[data-grade]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      state.grade = btn.dataset.grade;
-      markActive('grade', state.grade);
-      queueDraw();
-      setStatus(`Colour grade: ${GRADES[state.grade].label}.`);
-    });
-  });
-  $$('[data-size]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      state.size = btn.dataset.size;
-      markActive('size', state.size);
-      queueDraw();
-      setStatus(`Export size: ${SIZES[state.size].label}.`);
-    });
-  });
-  $$('#slotTabs button').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      state.activeSlot = Number(btn.dataset.slot);
-      syncSlotControls();
-    });
-  });
-  $('#zoomRange').addEventListener('input', (e) => {
-    state.photos[state.activeSlot].zoom = Number(e.target.value);
-    queueDraw();
-  });
-  $('#panXRange').addEventListener('input', (e) => {
-    state.photos[state.activeSlot].ox = Number(e.target.value);
-    queueDraw();
-  });
-  $('#panYRange').addEventListener('input', (e) => {
-    state.photos[state.activeSlot].oy = Number(e.target.value);
-    queueDraw();
-  });
-  $('#uploadA').addEventListener('change', (e) => {
-    if (e.target.files && e.target.files[0]) loadImageFile(e.target.files[0], 0);
-  });
-  $('#uploadB').addEventListener('change', (e) => {
-    if (e.target.files && e.target.files[0]) loadImageFile(e.target.files[0], 1);
-  });
-  $$('[data-sample]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      loadSample(btn.dataset.sample, Number(btn.dataset.slot));
-    });
-  });
-  $('#exportBtn').addEventListener('click', async () => {
-    setStatus('Exporting PNG…');
-    const ok = await exportCoverPNG(preview, state.size);
-    setStatus(ok
-      ? `Exported vice-city-cover-${state.size}.png (${SIZES[state.size].label}).`
-      : 'Export failed in this browser — try desktop Chrome.');
-  });
-  window.addEventListener('resize', fitPreviewToStage);
+function currentCrop() {
+  return state.editing === 'A' ? state.cropA : state.cropB;
 }
 
-// ---- Shot mode: deterministic renders for the entry's screenshots. ----
-function applyShotParams(params) {
-  const shot = params.get('shot');
-  if (!shot) return false;
-  const photo = params.get('photo') || 'pier';
-  const caption = params.get('caption');
-  const sub = params.get('sub');
-  const layout = params.get('layout');
-  const grade = params.get('grade');
-  const size = params.get('size');
-  if (caption) { state.caption = caption; $('#captionInput').value = caption; }
-  if (sub) { state.sub = sub; $('#subInput').value = sub; }
-  if (layout && LAYOUTS[layout]) { state.layout = layout; markActive('layout', layout); }
-  if (grade && GRADES[grade]) { state.grade = grade; markActive('grade', grade); }
-  if (size && SIZES[size]) { state.size = size; markActive('size', size); }
+function redraw() {
+  drawCover(canvas, state);
+}
+
+function syncCropControls() {
+  const crop = currentCrop();
+  $('zoom').value = String(crop.zoom);
+  $('panx').value = String(crop.dx);
+  $('pany').value = String(crop.dy);
+  $('editA').classList.toggle('active', state.editing === 'A');
+  $('editB').classList.toggle('active', state.editing === 'B');
+  $('cropLabel').textContent = `Editing Photo ${state.editing} (${state.editing === 'A' ? 'main panel' : 'second panel'})`;
+}
+
+function bindFile(inputId, slot) {
+  $(inputId).addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      state[slot] = await loadImage(URL.createObjectURL(file));
+      statusEl.textContent = `Photo ${slot === 'photoA' ? 'A' : 'B'} loaded — ${file.name}`;
+      redraw();
+    } catch {
+      statusEl.textContent = 'That file could not be read as an image.';
+    }
+  });
+}
+
+function bindSample(buttonId, sample, slot) {
+  $(buttonId).addEventListener('click', async () => {
+    try {
+      state[slot] = await loadImage(`samples/${sample}.jpg`);
+      statusEl.textContent = `Sample ${sample} loaded as Photo ${slot === 'photoA' ? 'A' : 'B'}.`;
+      redraw();
+    } catch {
+      statusEl.textContent = 'Sample photo failed to load.';
+    }
+  });
+}
+
+bindFile('photoA', 'photoA');
+bindFile('photoB', 'photoB');
+bindSample('samplePierA', 'pier', 'photoA');
+bindSample('sampleBlvdA', 'boulevard', 'photoA');
+bindSample('samplePierB', 'pier', 'photoB');
+bindSample('sampleBlvdB', 'boulevard', 'photoB');
+
+$('layout').addEventListener('change', (e) => {
+  state.layout = LAYOUTS.includes(e.target.value) ? e.target.value : 'duo';
+  redraw();
+});
+$('grade').addEventListener('change', (e) => {
+  state.grade = GRADES.includes(e.target.value) ? e.target.value : 'sunset';
+  redraw();
+});
+$('caption').addEventListener('input', (e) => {
+  state.caption = e.target.value;
+  redraw();
+});
+$('accent').addEventListener('input', (e) => {
+  state.accent = e.target.value;
+  redraw();
+});
+$('editA').addEventListener('click', () => { state.editing = 'A'; syncCropControls(); });
+$('editB').addEventListener('click', () => { state.editing = 'B'; syncCropControls(); });
+$('zoom').addEventListener('input', (e) => { currentCrop().zoom = Number(e.target.value); redraw(); });
+$('panx').addEventListener('input', (e) => { currentCrop().dx = Number(e.target.value); redraw(); });
+$('pany').addEventListener('input', (e) => { currentCrop().dy = Number(e.target.value); redraw(); });
+
+$('export').addEventListener('click', () => {
+  const size = EXPORT_SIZES[$('size').value] || EXPORT_SIZES.square;
+  const off = document.createElement('canvas');
+  off.width = size[0];
+  off.height = size[1];
+  drawCover(off, state);
+  off.toBlob((blob) => {
+    if (!blob) {
+      statusEl.textContent = 'Export failed — please try again.';
+      return;
+    }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `vice-city-cover-${size[0]}x${size[1]}.png`;
+    a.click();
+    statusEl.textContent = `Saved vice-city-cover-${size[0]}x${size[1]}.png`;
+  }, 'image/png');
+});
+
+// Keep the live preview at the export size's aspect so what you see is the PNG.
+$('size').addEventListener('change', () => {
+  const size = EXPORT_SIZES[$('size').value] || EXPORT_SIZES.square;
+  canvas.width = size[0];
+  canvas.height = size[1];
+  canvas.style.aspectRatio = `${size[0]} / ${size[1]}`;
+  redraw();
+});
+
+/** Fixed screenshot scenes: ?shot=cover shows the cover alone, ?shot=editor the editor. */
+async function runShot(query) {
+  const shot = query.get('shot') || 'cover';
   if (shot === 'cover') document.body.classList.add('shot-cover');
-  if (shot === 'editor') document.body.classList.add('shot-editor');
-  // Shot renders load the sample into both slots so every layout is full.
-  return new Promise((resolve) => {
-    let done = 0;
-    const both = () => { done += 1; if (done === 2) resolve(); };
-    const imgA = new Image();
-    imgA.onload = () => { state.photos[0] = { img: imgA, zoom: 1, ox: 0, oy: 0 }; both(); };
-    imgA.onerror = both;
-    imgA.src = `samples/${photo}.jpg`;
-    const other = photo === 'pier' ? 'boulevard' : 'pier';
-    const imgB = new Image();
-    imgB.onload = () => { state.photos[1] = { img: imgB, zoom: 1.05, ox: 0.1, oy: -0.05 }; both(); };
-    imgB.onerror = both;
-    imgB.src = `samples/${other}.jpg`;
-  });
-}
-
-async function start() {
-  bindControls();
-  syncSlotControls();
-  // Wait for the bundled fonts so the caption lettering draws correctly.
+  const layout = query.get('layout');
+  if (layout && LAYOUTS.includes(layout)) state.layout = layout;
+  const grade = query.get('grade');
+  if (grade && GRADES.includes(grade)) state.grade = grade;
+  state.caption = query.get('caption') || 'Sunset Heist';
+  state.accent = query.get('accent') || 'Vice City';
+  const w = Number(query.get('w') || '1080');
+  const h = Number(query.get('h') || '1080');
+  if (Number.isFinite(w) && Number.isFinite(h) && w >= 480 && h >= 480) {
+    canvas.width = w;
+    canvas.height = h;
+  }
   try {
-    await Promise.all([
-      document.fonts.load('400 100px Anton'),
-      document.fonts.load('400 60px Pacifico'),
-      document.fonts.ready,
-    ]);
+    state.photoA = await loadImage(`samples/${query.get('photo') || 'pier'}.jpg`);
+    state.photoB = await loadImage(`samples/${query.get('photo2') || 'boulevard'}.jpg`);
   } catch {
-    // If a font fails, the canvas still draws with the fallback stack.
+    statusEl.textContent = 'Sample photo failed to load.';
   }
-  const params = new URLSearchParams(window.location.search);
-  const shot = params.get('shot');
-  if (shot) {
-    await applyShotParams(params);
-    queueDraw();
-    // One extra draw after fonts settle, so lettering is never fallback.
-    setTimeout(queueDraw, 250);
-  } else {
-    queueDraw();
-    setStatus('Add your photo, pick a layout and a grade, then export your cover.');
+  if (document.fonts?.ready) {
+    try {
+      await Promise.race([
+        document.fonts.ready,
+        new Promise((r) => setTimeout(r, 1500)),
+      ]);
+    } catch { /* fall back to system fonts */ }
   }
+  redraw();
+  requestAnimationFrame(() => requestAnimationFrame(() => { window.__shotReady = true; }));
 }
 
-start();
+const query = new URLSearchParams(location.search);
+if (query.get('shot')) {
+  runShot(query);
+} else {
+  loadImage('samples/pier.jpg').then((img) => { state.photoA = img; redraw(); }).catch(() => redraw());
+  loadImage('samples/boulevard.jpg').then((img) => { state.photoB = img; redraw(); }).catch(() => {});
+  syncCropControls();
+  redraw();
+}
