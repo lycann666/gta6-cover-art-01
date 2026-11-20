@@ -1,8 +1,8 @@
 # Vice City Cover Maker
 
-![Vice City Cover Maker](https://img.shields.io/badge/make.fun-gta6--cover--art--01-ff2e88)
-![Offline](https://img.shields.io/badge/works-offline-2de2c5)
-![License: MIT](https://img.shields.io/badge/License-MIT-ffb347)
+[![make.fun · gta6-cover-art-01](https://make.fun/badge/gta6-cover-art-01.svg)](https://make.fun/bounty/gta6-cover-art-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
+[![rank](https://make.fun/badge/gta6-cover-art-01/lycann666/gta6-cover-art-01/rank.svg)](https://make.fun/bounty/gta6-cover-art-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
+[![reward](https://make.fun/badge/gta6-cover-art-01/lycann666/gta6-cover-art-01/reward.svg)](https://make.fun/bounty/gta6-cover-art-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
 
 A neon Vice City studio that turns **your photo + a caption** into GTA-style
 multi-panel poster art — and exports it as a PNG to share. Static files only,
@@ -65,3 +65,7 @@ mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 ## License
 
 MIT — see `LICENSE`.
+
+---
+
+Built for the [gta6-cover-art-01 bounty on make.fun](https://make.fun/bounty/gta6-cover-art-01). Referral: https://make.fun/r/5f3j6jyb
